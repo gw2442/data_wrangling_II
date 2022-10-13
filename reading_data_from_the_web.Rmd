@@ -6,6 +6,8 @@ date: "2022-10-13"
 
 ```{r}
 library(tidyverse)
+library(rvest)
+library(httr)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -23,5 +25,56 @@ options(
 scale_colour_discrete = scale_color_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
+
+## NSDUH data
+```{r}
+url = "http://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2k15StateFiles/NSDUHsaeShortTermCHG2015.htm"
+drug_use_html = read_html(url)
+
+drug_use_html
+```
+
+```{r}
+drug_use_html %>%
+  html_table() %>%
+  first() %>%
+  slice(-1)
+```
+
+## SW data
+
+```{r}
+url = "https://www.imdb.com/list/ls070150896/"
+swm_html = read_html(url)
+```
+
+How do I get the stuff that I want?
+
+```{r}
+sw_titles = 
+  swm_html %>%
+  html_elements(".lister-item-header a") %>%
+  html_text()
+
+sw_runtime = 
+  swm_html %>%
+  html_elements(".runtime") %>%
+  html_text()
+
+sw_money = 
+  swm_html %>%
+  html_elements(".text-small:nth-child(7) span:nth-child(5)") %>%
+  html_text()
+
+sw_df = 
+  tibble(
+    title = sw_titles,
+    runtime = sw_runtime,
+    money = sw_money
+  )
+```
+
+
+
 
 
